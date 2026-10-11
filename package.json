@@ -1,0 +1,16 @@
+{
+  "name": "com.first-person-horror-kit",
+  "version": "0.1.0",
+  "displayName": "First-Person Horror Kit",
+  "description": "First-person player, camera, flashlight and interaction scripts for horror games.",
+  "unity": "6000.4",
+  "author": {
+    "name": "FMihPotat"
+  },
+  "dependencies": {
+    "com.unity.ugui": "2.0.0",
+    "com.unity.modules.animation": "1.0.0",
+    "com.unity.modules.audio": "1.0.0",
+    "com.unity.modules.physics": "1.0.0"
+  }
+}
