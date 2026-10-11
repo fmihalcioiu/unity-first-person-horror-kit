@@ -11,16 +11,26 @@ namespace com.first_person_horror_kit.Player
         [Header("Look Smoothing")]
         [SerializeField] private float smoothSpeed = 10f;
 
+        [Header("Optional")]
+        [SerializeField] private HeadBob headBob;
+
         private float targetXRotation;
         private float currentXRotation;
 
         private float yRotation;
         private float targetYRotation;
 
+        private Vector3 baseLocalPosition;
+
         private bool hasFocus;
 
         private void Start()
         {
+            baseLocalPosition = transform.localPosition;
+
+            if (headBob == null)
+                headBob = GetComponent<HeadBob>();
+
             InitializeLookState();
             LockCursor();
         }
@@ -81,12 +91,18 @@ namespace com.first_person_horror_kit.Player
             transform.localRotation = Quaternion.Euler(currentXRotation, 0f, 0f);
 
             playerBody.rotation = Quaternion.Euler(0f, yRotation, 0f);
+
+            Vector3 headBobOffset = headBob != null ? headBob.CurrentOffset : Vector3.zero;
+            transform.localPosition = baseLocalPosition + headBobOffset;
         }
 
         private void Reset()
         {
             if (playerBody == null && transform.parent != null)
                 playerBody = transform.parent;
+
+            if (headBob == null)
+                headBob = GetComponent<HeadBob>();
         }
 
         private void OnValidate()
