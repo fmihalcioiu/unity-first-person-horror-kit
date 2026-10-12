@@ -24,6 +24,11 @@ namespace com.first_person_horror_kit.Player
         [SerializeField] private float idleBreathSpeed = 1.2f;
         [SerializeField] private float idleBreathAmount = 0.008f;
 
+        [Header("Wall Clip Prevention")]
+        [SerializeField] private LayerMask wallMask = ~0;
+        [SerializeField] private float wallCheckDistance = 0.35f;
+        [Range(0f, 1f)] [SerializeField] private float nearWallBobMultiplier = 0.35f;
+
         [Header("Smoothing")]
         [SerializeField] private float positionLerpSpeed = 12f;
 
@@ -58,6 +63,12 @@ namespace com.first_person_horror_kit.Player
             float bobAmount = sprinting ? sprintBobAmount : walkBobAmount;
             float sideAmount = sideBobAmount;
 
+            if (IsWallCloseAhead())
+            {
+                bobAmount *= nearWallBobMultiplier;
+                sideAmount *= nearWallBobMultiplier;
+            }
+
             Vector3 targetOffset = Vector3.zero;
 
             if (isMoving)
@@ -78,6 +89,11 @@ namespace com.first_person_horror_kit.Player
             currentOffset = Vector3.Lerp(currentOffset, targetOffset, Time.deltaTime * positionLerpSpeed);
         }
 
+        private bool IsWallCloseAhead()
+        {
+            return Physics.Raycast(transform.position, transform.forward, wallCheckDistance, wallMask, QueryTriggerInteraction.Ignore);
+        }
+
         private void Reset()
         {
             if (characterController == null)
@@ -85,6 +101,12 @@ namespace com.first_person_horror_kit.Player
 
             if (playerController == null)
                 playerController = GetComponentInParent<PlayerController>();
+        }
+
+        private void OnValidate()
+        {
+            if (wallCheckDistance < 0.01f)
+                wallCheckDistance = 0.01f;
         }
     }
 }
