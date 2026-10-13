@@ -1,4 +1,5 @@
 using com.first_person_horror_kit.Core;
+using com.first_person_horror_kit.UI;
 using UnityEngine;
 
 namespace com.first_person_horror_kit.Systems
@@ -11,7 +12,16 @@ namespace com.first_person_horror_kit.Systems
         [SerializeField] private Transform rayOrigin;
         [SerializeField] private KeyCode interactKey = KeyCode.E;
 
+        [Header("Dialogue")]
+        [SerializeField] private InteractionDialog interactionDialog;
+
         private readonly RaycastHit[] raycastHits = new RaycastHit[32];
+
+        private void Start()
+        {
+            if (interactionDialog != null)
+                interactionDialog.gameObject.SetActive(true);
+        }
 
         private void Update()
         {
@@ -21,15 +31,41 @@ namespace com.first_person_horror_kit.Systems
             if (!Input.GetKeyDown(interactKey))
                 return;
 
-            if (!TryGetNearestInteractable(out IInteractable interactable))
+            if (!TryGetNearestInteractable(out IInteractable interactable, out Collider interactableCollider))
                 return;
+
+            TryInteract(interactable, interactableCollider);
+        }
+
+        private void TryInteract(IInteractable interactable, Collider interactableCollider)
+        {
+            IConfirmableInteractable confirmable = interactableCollider != null
+                ? interactableCollider.GetComponentInParent<IConfirmableInteractable>()
+                : null;
+
+            if (confirmable != null && interactionDialog != null)
+            {
+                string message = confirmable.GetConfirmationPrompt();
+                if (!string.IsNullOrEmpty(message))
+                {
+                    interactionDialog.Show(
+                        message,
+                        () => interactable.Interact(),
+                        null,
+                        confirmable.GetPrimaryOptionText(),
+                        confirmable.GetSecondaryOptionText());
+
+                    return;
+                }
+            }
 
             interactable.Interact();
         }
 
-        private bool TryGetNearestInteractable(out IInteractable interactable)
+        private bool TryGetNearestInteractable(out IInteractable interactable, out Collider interactableCollider)
         {
             interactable = null;
+            interactableCollider = null;
 
             if (rayOrigin == null)
                 return false;
@@ -78,6 +114,7 @@ namespace com.first_person_horror_kit.Systems
                 return false;
 
             interactable = nearestInteractable;
+            interactableCollider = nearestHit.collider;
             return true;
         }
 
