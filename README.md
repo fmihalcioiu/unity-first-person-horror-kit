@@ -1,12 +1,14 @@
 # First-Person Horror Kit
 
-Unity scripts for a first-person horror game: the player controller, camera feel, a flashlight, and interaction with doors, light switches and pickups.
+Unity scripts for a first-person horror game: the player controller with footsteps that change with the ground, camera feel, a flashlight, and interaction with doors, light switches and pickups.
 
 ## Contents
 
 | Script | What it does |
 |---|---|
 | `PlayerController` | Walks and sprints on a `CharacterController`, with gravity. Slides along walls it runs into. |
+| `Footsteps` | Plays a step sound at a set pace while the player walks or sprints. The clip depends on the terrain layer or Physics Material underfoot. |
+| `FootstepProfile` | The asset that holds the step clips. Each set has walk and sprint clips and belongs to a Physics Material or to terrain layers, with default clips for any other ground. |
 | `MouseLook` | Smoothed mouse look with a slight tilt when strafing and a slow hand shake. |
 | `HeadBob` | Bobs the camera while walking and adds a slow breathing motion when standing still. The bob is weaker right in front of a wall. |
 | `CameraZoom` | Zooms while the right mouse button is held and lowers look sensitivity while zoomed. A short focus pulse plays when the zoom settles. |
@@ -47,7 +49,7 @@ Or add this line to `Packages/manifest.json`:
 Laid out like this, the scripts find most of their references on their own:
 
 ```
-Player            CharacterController, PlayerController
+Player            CharacterController, PlayerController, Footsteps, AudioSource
 └── Camera        Camera, MouseLook, HeadBob, CameraZoom, InteractionController
     └── Flashlight      Flashlight, FlashlightRealism, FlashlightSwaySmooth
         └── Spot Light  Light
@@ -57,8 +59,11 @@ Player            CharacterController, PlayerController
 - `InteractionController`: `Ray Origin` defaults to the camera it sits on. Set `Interact Layer` to the layers your interactables use, and assign an `Interaction Dialog` if some interactions should ask first.
 - `FlashlightSwaySmooth`: assign `Flashlight Model` and `Player Camera` by hand.
 - `CameraZoom`: assign `Flashlight Zoom Root` to move the flashlight model out of view while zoomed.
+- `Footsteps`: assign a `Profile`. Steps play through the `AudioSource` on the player unless you assign another one in `Footstep Source`.
 
-`Door` and `LightSwitch` play their sounds through an `AudioSource` on their own object. The other scripts with sounds have an `Audio Source` field that defaults to one on their own object.
+The package has no sound files. Create a footstep profile from Create > com.first_person_horror_kit > Audio > Footstep Profile and fill it with your own clips.
+
+`Door` and `LightSwitch` play their sounds through an `AudioSource` on their own object. The other scripts with sounds have a field for their `AudioSource`, which defaults to one on their own object.
 
 ## UI setup
 
