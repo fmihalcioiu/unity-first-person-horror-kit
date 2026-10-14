@@ -25,6 +25,9 @@ namespace com.first_person_horror_kit.Player
         [SerializeField] private AudioClip turnOnSound;
         [SerializeField] private AudioClip turnOffSound;
 
+        [Header("Optional")]
+        [SerializeField] private FlashlightRealism flashlightRealism;
+
         public bool IsOn => isOn;
         public bool IsAnimating => fadeRoutine != null;
 
@@ -35,6 +38,12 @@ namespace com.first_person_horror_kit.Player
 
         private void Awake()
         {
+            if (flashlightRealism == null)
+                flashlightRealism = GetComponent<FlashlightRealism>();
+
+            if (flashlightRealism == null)
+                flashlightRealism = GetComponentInChildren<FlashlightRealism>();
+
             if (flashlight == null)
                 return;
 
@@ -42,6 +51,9 @@ namespace com.first_person_horror_kit.Player
             initialShadowMode = flashlight.shadows;
 
             isOn = startOn;
+
+            if (!isOn && flashlightRealism != null)
+                flashlightRealism.enabled = false;
 
             flashlight.intensity = isOn ? maxLightIntensity : 0f;
             flashlight.enabled = keepLightEnabled || isOn;
@@ -102,6 +114,9 @@ namespace com.first_person_horror_kit.Player
             if (!flashlight.enabled)
                 flashlight.enabled = true;
 
+            if (flashlightRealism != null)
+                flashlightRealism.enabled = false;
+
             float startIntensity = flashlight.intensity;
             float targetIntensity = turnOn ? maxLightIntensity : 0f;
 
@@ -120,6 +135,9 @@ namespace com.first_person_horror_kit.Player
 
             if (!turnOn && !keepLightEnabled)
                 flashlight.enabled = false;
+
+            if (turnOn && flashlightRealism != null)
+                flashlightRealism.enabled = true;
 
             fadeRoutine = null;
         }
@@ -148,6 +166,12 @@ namespace com.first_person_horror_kit.Player
 
             if (audioSource == null)
                 audioSource = GetComponent<AudioSource>();
+
+            if (flashlightRealism == null)
+                flashlightRealism = GetComponent<FlashlightRealism>();
+
+            if (flashlightRealism == null)
+                flashlightRealism = GetComponentInChildren<FlashlightRealism>(true);
         }
     }
 }
