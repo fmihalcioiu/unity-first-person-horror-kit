@@ -56,6 +56,7 @@ namespace com.first_person_horror_kit.Player
         private Vector3 currentPositionShake;
 
         private bool hasFocus;
+        private float sensitivityMultiplier = 1f;
         private float noiseTime;
 
         private float seedX;
@@ -114,6 +115,11 @@ namespace com.first_person_horror_kit.Player
             hasFocus = true;
         }
 
+        public void SetSensitivityMultiplier(float multiplier)
+        {
+            sensitivityMultiplier = Mathf.Clamp(multiplier, 0.05f, 2f);
+        }
+
         private void Update()
         {
             if (GameplayState.isInputBlocked || !hasFocus)
@@ -122,8 +128,10 @@ namespace com.first_person_horror_kit.Player
             if (playerController == null)
                 return;
 
-            float mouseX = Input.GetAxisRaw("Mouse X") * mouseSensitivity;
-            float mouseY = Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
+            float sensitivity = mouseSensitivity * sensitivityMultiplier;
+
+            float mouseX = Input.GetAxisRaw("Mouse X") * sensitivity;
+            float mouseY = Input.GetAxisRaw("Mouse Y") * sensitivity;
 
             targetXRotation = Mathf.Clamp(targetXRotation - mouseY, -85f, 85f);
             targetYRotation += mouseX;
